@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KG2 English Alphabet Activity Book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&family=Cairo:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-gradient: linear-gradient(90deg, #dcfce7 0%, #e0f2fe 50%, #dbeafe 100%);
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .arabic-ui {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* Workbook Page Styling matching the PDF */
+        .workbook-page {
+            width: 210mm;
+            height: 297mm;
+            background: var(--page-gradient);
+            padding: 14mm;
+            box-sizing: border-box;
+            position: relative;
+            margin: 20px auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .page-border {
+            width: 100%;
+            height: 100%;
+            border: 4px dashed #1e293b;
+            border-radius: 28px;
+            box-sizing: border-box;
+            padding: 24px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        /* Dotted Tracing Effect via SVG & CSS */
+        .trace-line-container {
+            position: relative;
+            width: 100%;
+            height: 110px;
+            border-top: 3px solid #64748b;
+            border-bottom: 3px solid #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.55);
+            border-radius: 12px;
+        }
+
+        .trace-line-container::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            border-top: 2.5px dashed #94a3b8;
+            z-index: 1;
+        }
+
+        .trace-svg-text {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 3px;
+            stroke-dasharray: 2, 7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Outline Text for Coloring */
+        .coloring-text {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            fill: #ffffff;
+            stroke: #0f172a;
+            stroke-width: 5px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            cursor: pointer;
+            transition: fill 0.2s ease;
+        }
+
+        .coloring-text:hover {
+            stroke: #3b82f6;
+        }
+
+        /* Bubble circles for "Find and Circle" */
+        .letter-bubble {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+            border: 3.5px dashed #334155;
+            background: rgba(255, 255, 255, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .letter-bubble.circled::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 5px solid #16a34a;
+            border-radius: 50%;
+            animation: popIn 0.25s ease-out;
+        }
+
+        /* Full-Page Interactive Drawing Canvas Overlay */
+        .page-interactive-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 30;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        .interactive-widget {
+            position: relative;
+            z-index: 40;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive scaling for smaller screens in Interactive View */
+        @media (max-width: 850px) {
+            .workbook-page-wrapper {
+                overflow-x: auto;
+                padding: 10px;
+                display: flex;
+                justify-content: center;
+            }
+            .workbook-page {
+                transform: scale(0.46);
+                transform-origin: top center;
+                margin-bottom: -155mm;
+            }
+        }
+
+        @media (min-width: 851px) and (max-width: 1100px) {
+            .workbook-page {
+                transform: scale(0.75);
+                transform-origin: top center;
+                margin-bottom: -70mm;
+            }
+        }
+
+        /* Print Media Styles */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            body {
+                background: white;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .workbook-page {
+                margin: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                page-break-after: always;
+                break-after: page;
+                transform: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Control Bar (Arabic & English Friendly) -->
+    <header class="no-print bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <!-- Brand / Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-400 to-sky-500 flex items-center justify-center text-white font-bold text-2xl shadow-md">
+                    Aa
+                </div>
+                <div>
+                    <h1 class="arabic-ui font-bold text-slate-800 text-lg leading-tight">كتيب أنشطة الحروف الإنجليزية (Ages 3-6 • KG1/KG2)</h1>
+                    <p class="text-xs text-slate-500">نسخة الكتاب الهجين (PDF + QR Code تفاعلي) • جاهز للنشر على Google Books</p>
+                </div>
+            </div>
+
+            <!-- Letter Filter & Navigation -->
+            <div class="flex flex-wrap items-center gap-2 arabic-ui">
+                <label class="text-sm font-bold text-slate-700 ml-1">اختر الحرف:</label>
+                <select id="letterSelector" onchange="jumpToLetter(this.value)" class="bg-slate-100 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2 font-bold focus:ring-2 focus:ring-sky-400 outline-none">
+                    <!-- Populated dynamically by JS -->
+                </select>
+
+                <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
+                    <button onclick="prevPage()" class="px-3 py-1.5 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 font-bold text-sm transition" title="Previous Page">
+                        ◀ السابق
+                    </button>
+                    <span id="pageIndicator" class="px-3 text-xs font-bold text-slate-600">1 / 132</span>
+                    <button onclick="nextPage()" class="px-3 py-1.5 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 font-bold text-sm transition" title="Next Page">
+                        التالي ▶
+                    </button>
+                </div>
+            </div>
+
+            <!-- Print / Export Buttons -->
+            <div class="flex items-center gap-2 arabic-ui">
+                <button onclick="speakCurrentLetter()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5 shadow-sm">
+                    <span>🔊</span> نطق الحرف والكلمة
+                </button>
+                <button onclick="printCurrentLetterOnly()" class="bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-1.5">
+                    <span>🖨️</span> طباعة الحرف (5 صفحات)
+                </button>
+                <button onclick="printFullBook()" class="bg-gradient-to-r from-emerald-500 to-sky-600 hover:from-emerald-600 hover:to-sky-700 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-md transition flex items-center gap-1.5">
+                    <span>📄</span> حفظ الكتيب PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced Interactive Drawing & Coloring Toolbar for Kids -->
+        <div class="bg-slate-50 border-t border-slate-200 px-4 py-2.5">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+                <!-- Tool Mode Selector -->
+                <div class="flex flex-wrap items-center gap-2 arabic-ui">
+                    <span class="text-xs font-bold text-slate-700">🛠️ أداة الطفل:</span>
+                    <button id="toolPen" onclick="setTool('pen')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white shadow-sm transition flex items-center gap-1">
+                        ✏️ قلم كتابة وتتبع النقاط
+                    </button>
+                    <button id="toolBrush" onclick="setTool('brush')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition flex items-center gap-1">
+                        🖍️ فرشاة تلوين عريضة
+                    </button>
+                    <button id="toolEraser" onclick="setTool('eraser')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition flex items-center gap-1">
+                        🧽 ممحاة (أستيكة)
+                    </button>
+                    <button onclick="clearCurrentPageDrawing()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-100 text-rose-700 hover:bg-rose-200 transition flex items-center gap-1">
+                        🗑️ مسح الصفحة
+                    </button>
+                </div>
+
+                <!-- Color Palette -->
+                <div class="flex items-center gap-2 arabic-ui text-xs font-bold text-slate-600">
+                    <span>🎨 اختر اللون:</span>
+                    <div id="colorPalette" class="flex items-center gap-2">
+                        <button onclick="setColor('#ef4444')" class="w-7 h-7 rounded-full bg-red-500 ring-2 ring-offset-2 ring-slate-800 scale-110 transition"></button>
+                        <button onclick="setColor('#f97316')" class="w-7 h-7 rounded-full bg-orange-500 hover:scale-110 transition"></button>
+                        <button onclick="setColor('#eab308')" class="w-7 h-7 rounded-full bg-yellow-500 hover:scale-110 transition"></button>
+                        <button onclick="setColor('#22c55e')" class="w-7 h-7 rounded-full bg-green-500 hover:scale-110 transition"></button>
+                        <button onclick="setColor('#0ea5e9')" class="w-7 h-7 rounded-full bg-sky-500 hover:scale-110 transition"></button>
+                        <button onclick="setColor('#8b5cf6')" class="w-7 h-7 rounded-full bg-violet-500 hover:scale-110 transition"></button>
+                        <button onclick="setColor('#ec4899')" class="w-7 h-7 rounded-full bg-pink-500 hover:scale-110 transition"></button>
+                        <button onclick="setColor('#1e293b')" class="w-7 h-7 rounded-full bg-slate-800 hover:scale-110 transition"></button>
+                    </div>
+                </div>
+
+                <!-- QR Code Link Customizer for the Author -->
+                <div class="flex items-center gap-2 arabic-ui text-xs bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                    <span class="font-bold text-emerald-800">🔗 رابط الـ QR Code:</span>
+                    <input id="customQrUrlInput" type="url" dir="ltr" placeholder="https://your-interactive-book-link.com" oninput="updateQrUrl(this.value)" class="bg-white border border-emerald-300 rounded-lg px-2.5 py-1 text-xs text-slate-700 w-52 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Single-Page Interactive Viewer -->
+    <main id="interactiveContainer" class="no-print flex-1 workbook-page-wrapper py-4">
+        <div id="activePageSlot"></div>
+    </main>
+
+    <!-- Hidden Print Container for Generating Multi-page PDF -->
+    <div id="printContainer" class="hidden print:block"></div>
+
+    <script>
+        // Complete KG2 Alphabet Curriculum Data (A-Z) with rich SVG/Emoji illustrations & Phonics words
+        const alphabetData = [
+            { letter: 'A', lower: 'a', word: 'APPLE', emoji: '🍎', secondWord: 'Ant', secondEmoji: '🐜', distractors: ['B', 'C', 'e', 'm', 'R', 's', 'T'] },
+            { letter: 'B', lower: 'b', word: 'BALL', emoji: '⚽', secondWord: 'Bee', secondEmoji: '🐝', distractors: ['P', 'd', 'R', 'a', 'E', 'q', 's'] },
+            { letter: 'C', lower: 'c', word: 'CAT', emoji: '🐱', secondWord: 'Car', secondEmoji: '🚗', distractors: ['O', 'G', 'e', 's', 'a', 'u', 'D'] },
+            { letter: 'D', lower: 'd', word: 'DUCK', emoji: '🦆', secondWord: 'Dog', secondEmoji: '🐶', distractors: ['b', 'P', 'O', 'a', 'q', 'C', 'g'] },
+            { letter: 'E', lower: 'e', word: 'EGG', emoji: '🥚', secondWord: 'Elephant', secondEmoji: '🐘', distractors: ['F', 'c', 'a', 'B', 'L', 'o', 'H'] },
+            { letter: 'F', lower: 'f', word: 'FISH', emoji: '🐟', secondWord: 'Frog', secondEmoji: '🐸', distractors: ['E', 't', 'P', 'r', 'L', 'k', 'b'] },
+            { letter: 'G', lower: 'g', word: 'GRAPES', emoji: '🍇', secondWord: 'Goat', secondEmoji: '🐐', distractors: ['C', 'q', 'p', 'O', 'y', 'd', 'a'] },
+            { letter: 'H', lower: 'h', word: 'HAT', emoji: '👒', secondWord: 'Horse', secondEmoji: '🐴', distractors: ['n', 'M', 'b', 'k', 'A', 'T', 'r'] },
+            { letter: 'I', lower: 'i', word: 'IGLOO', emoji: '🛖', secondWord: 'Ice cream', secondEmoji: '🍦', distractors: ['j', 'L', 'T', 'l', 'f', 'r', 'E'] },
+            { letter: 'J', lower: 'j', word: 'JUICE', emoji: '🧃', secondWord: 'Jellyfish', secondEmoji: '🪼', distractors: ['i', 'U', 'g', 'y', 'L', 't', 'p'] },
+            { letter: 'K', lower: 'k', word: 'KITE', emoji: '🪁', secondWord: 'Koala', secondEmoji: '🐨', distractors: ['R', 'h', 'X', 'b', 'Y', 'l', 'N'] },
+            { letter: 'L', lower: 'l', word: 'LION', emoji: '🦁', secondWord: 'Leaf', secondEmoji: '🍃', distractors: ['I', 't', 'F', 'E', 'j', 'r', 'k'] },
+            { letter: 'M', lower: 'm', word: 'MONKEY', emoji: '🐵', secondWord: 'Moon', secondEmoji: '🌙', distractors: ['W', 'n', 'N', 'H', 'u', 'v', 'r'] },
+            { letter: 'N', lower: 'n', word: 'NEST', emoji: '🪺', secondWord: 'Net', secondEmoji: '🥅', distractors: ['m', 'M', 'u', 'h', 'Z', 'r', 'H'] },
+            { letter: 'O', lower: 'o', word: 'ORANGE', emoji: '🍊', secondWord: 'Owl', secondEmoji: '🦉', distractors: ['C', 'Q', 'a', 'e', 'D', 'c', 'g'] },
+            { letter: 'P', lower: 'p', word: 'PIZZA', emoji: '🍕', secondWord: 'Penguin', secondEmoji: '🐧', distractors: ['b', 'q', 'R', 'd', 'B', 'g', 'a'] },
+            { letter: 'Q', lower: 'q', word: 'QUEEN', emoji: '👑', secondWord: 'Quilt', secondEmoji: '🛌', distractors: ['O', 'p', 'g', 'd', 'b', 'G', 'a'] },
+            { letter: 'R', lower: 'r', word: 'RABBIT', emoji: '🐰', secondWord: 'Rainbow', secondEmoji: '🌈', distractors: ['P', 'B', 'n', 'k', 'f', 'h', 't'] },
+            { letter: 'S', lower: 's', word: 'SUN', emoji: '☀️', secondWord: 'Star', secondEmoji: '⭐', distractors: ['Z', 'c', 'z', 'e', 'a', 'G', 'o'] },
+            { letter: 'T', lower: 't', word: 'TREE', emoji: '🌳', secondWord: 'Tiger', secondEmoji: '🐯', distractors: ['I', 'f', 'L', 'l', 'i', 'F', 'r'] },
+            { letter: 'U', lower: 'u', word: 'UMBRELLA', emoji: '☂️', secondWord: 'Unicorn', secondEmoji: '🦄', distractors: ['n', 'V', 'v', 'J', 'w', 'm', 'o'] },
+            { letter: 'V', lower: 'v', word: 'VAN', emoji: '🚐', secondWord: 'Violin', secondEmoji: '🎻', distractors: ['U', 'w', 'W', 'y', 'u', 'A', 'n'] },
+            { letter: 'W', lower: 'w', word: 'WATCH', emoji: '⌚', secondWord: 'Whale', secondEmoji: '🐳', distractors: ['M', 'v', 'V', 'm', 'u', 'N', 'y'] },
+            { letter: 'X', lower: 'x', word: 'XYLOPHONE', emoji: '🎹', secondWord: 'X-ray', secondEmoji: '🩻', distractors: ['K', 'z', 'Y', 'v', 'k', 'Z', 'w'] },
+            { letter: 'Y', lower: 'y', word: 'YO-YO', emoji: '🪀', secondWord: 'Yacht', secondEmoji: '⛵', distractors: ['V', 'v', 'g', 'j', 'X', 'u', 'K'] },
+            { letter: 'Z', lower: 'z', word: 'ZEBRA', emoji: '🦓', secondWord: 'Zoo', secondEmoji: '🦁', distractors: ['S', 's', 'N', 'x', 'X', 'e', 'c'] }
+        ];
+
+        let currentColor = '#ef4444';
+        let currentTool = 'pen'; // 'pen' | 'brush' | 'eraser'
+        let currentPageIndex = 0;
+        let allPagesList = [];
+        let interactiveAppUrl = 'https://play.google.com/store/books';
+        // Save child's drawings per page in memory so they don't disappear when flipping pages
+        const savedPageDrawings = {};
+
+        function updateQrUrl(val) {
+            interactiveAppUrl = val.trim() || 'https://play.google.com/store/books';
+            if (currentPageIndex === 0) {
+                renderCurrentPage();
+            }
+        }
+
+        function setColor(hex) {
+            currentColor = hex;
+            if (currentTool === 'eraser') {
+                setTool('pen');
+            }
+            const buttons = document.querySelectorAll('#colorPalette button');
+            buttons.forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-offset-2', 'ring-slate-800', 'scale-110');
+                if (btn.getAttribute('onclick').includes(hex)) {
+                    btn.classList.add('ring-2', 'ring-offset-2', 'ring-slate-800', 'scale-110');
+                }
+            });
+        }
+
+        function setTool(toolName) {
+            currentTool = toolName;
+            const tools = {
+                pen: document.getElementById('toolPen'),
+                brush: document.getElementById('toolBrush'),
+                eraser: document.getElementById('toolEraser')
+            };
+            Object.keys(tools).forEach(k => {
+                if (k === toolName) {
+                    tools[k].className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 text-white shadow-sm transition flex items-center gap-1';
+                } else {
+                    tools[k].className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-100 transition flex items-center gap-1';
+                }
+            });
+        }
+
+        // Speak current letter & phonics word aloud using Web Speech API
+        function speakCurrentLetter() {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const pageObj = allPagesList[currentPageIndex];
+            let textToSpeak = "My Alphabet Activity Book";
+            if (pageObj && pageObj.data) {
+                const d = pageObj.data;
+                textToSpeak = `${d.letter}! ${d.letter} is for ${d.word.toLowerCase()}, and ${d.secondWord.toLowerCase()}.`;
+            } else if (pageObj && pageObj.type === 'cert') {
+                textToSpeak = "Congratulations! Great job completing your Alphabet Activity Book!";
+            }
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            utterance.pitch = 1.15;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Build the flat list of all 132 pages (Cover + 26*5 + Certificate)
+        function buildPageRegistry() {
+            allPagesList = [];
+            allPagesList.push({ type: 'cover' });
+
+            alphabetData.forEach((item, idx) => {
+                // 5 structured pages per letter, mirroring the uploaded PDF
+                allPagesList.push({ type: 'color', data: item, letterIdx: idx });
+                allPagesList.push({ type: 'trace', data: item, letterIdx: idx });
+                allPagesList.push({ type: 'find', data: item, letterIdx: idx });
+                allPagesList.push({ type: 'draw', data: item, letterIdx: idx });
+                allPagesList.push({ type: 'match', data: item, letterIdx: idx });
+            });
+
+            allPagesList.push({ type: 'cert' });
+
+            // Populate dropdown selector
+            const sel = document.getElementById('letterSelector');
+            let html = `<option value="0">📖 الغلاف (Cover Page)</option>`;
+            alphabetData.forEach((item, idx) => {
+                const startPage = 1 + idx * 5;
+                html += `<option value="${startPage}">${item.emoji} Letter ${item.letter}${item.lower} - ${item.word}</option>`;
+            });
+            html += `<option value="${allPagesList.length - 1}">🎓 شهادة التقدير (Certificate)</option>`;
+            sel.innerHTML = html;
+        }
+
+        // Render HTML for a specific page object
+        function generatePageHTML(pageObj, pageNumber) {
+            if (pageObj.type === 'cover') {
+                const encodedUrl = encodeURIComponent(interactiveAppUrl);
+                const qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=${encodedUrl}`;
+
+                return `
+                <div class="workbook-page">
+                    <div class="page-border justify-between py-6">
+                        <!-- Top Title & Age Badge (Ages 3-6 Years) -->
+                        <div class="text-center space-y-2">
+                            <div class="inline-flex items-center gap-2 bg-white/90 text-sky-800 font-bold px-6 py-1.5 rounded-full text-base border-2 border-sky-400 shadow-sm">
+                                <span>🌟 PRESCHOOL & KINDERGARTEN (KG1 - KG2)</span>
+                                <span>•</span>
+                                <span class="text-emerald-700">AGES 3–6 YEARS</span>
+                            </div>
+                            <h1 class="text-5xl font-bold text-slate-900 tracking-wide pt-1">MY ALPHABET</h1>
+                            <h2 class="text-2xl font-bold text-sky-700">INTERACTIVE & PRINTABLE ACTIVITY BOOK</h2>
+                        </div>
+
+                        <!-- Cute Decorative Alphabet Illustration -->
+                        <div class="my-2 flex flex-col items-center">
+                            <div class="grid grid-cols-3 gap-5 bg-white/80 p-5 rounded-3xl border-4 border-dashed border-slate-700 shadow-sm">
+                                <div class="w-20 h-20 rounded-2xl bg-rose-100 border-2 border-rose-400 flex flex-col items-center justify-center">
+                                    <span class="text-3xl font-bold text-rose-600">Aa</span>
+                                    <span class="text-xl">🍎</span>
+                                </div>
+                                <div class="w-20 h-20 rounded-2xl bg-amber-100 border-2 border-amber-400 flex flex-col items-center justify-center">
+                                    <span class="text-3xl font-bold text-amber-600">Bb</span>
+                                    <span class="text-xl">⚽</span>
+                                </div>
+                                <div class="w-20 h-20 rounded-2xl bg-sky-100 border-2 border-sky-400 flex flex-col items-center justify-center">
+                                    <span class="text-3xl font-bold text-sky-600">Cc</span>
+                                    <span class="text-xl">🐱</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Smart QR Code Bonus Card for Google Books -->
+                        <div class="w-full max-w-xl bg-white/95 border-4 border-emerald-600 rounded-3xl p-4 shadow-md flex items-center gap-5 interactive-widget">
+                            <div class="flex-shrink-0 bg-white p-2 rounded-2xl border-2 border-dashed border-slate-400 flex flex-col items-center">
+                                <img src="${qrImgSrc}" alt="Interactive Edition QR Code" class="w-28 h-28 object-contain rounded-lg" onerror="this.src='https://placehold.co/150x150/ffffff/0f172a?text=SCAN+ME'" />
+                                <span class="text-[11px] font-bold text-emerald-700 mt-1 uppercase tracking-wider">📱 Scan & Play!</span>
+                            </div>
+
+                            <div class="text-left flex-1 space-y-1.5">
+                                <div class="inline-block bg-amber-100 text-amber-900 text-xs font-bold px-3 py-0.5 rounded-full border border-amber-300">
+                                    🎁 FREE INTERACTIVE BONUS INCLUDED!
+                                </div>
+                                <h4 class="text-lg font-bold text-slate-900 leading-snug">
+                                    Scan to Unlock the Fun Interactive Edition!
+                                </h4>
+                                <p class="text-xs font-semibold text-slate-600 leading-relaxed">
+                                    Simply scan this QR code with your phone or tablet camera for an exciting, easy-to-use interactive learning experience! Designed for kids <strong>Ages 3–6</strong>:
+                                </p>
+                                <div class="grid grid-cols-2 gap-1 pt-1 text-xs font-bold text-sky-800">
+                                    <span>✏️ Trace & Write with Finger/Pen</span>
+                                    <span>🖍️ Colour Letters & Shapes</span>
+                                    <span>🔊 Hear Phonics & Words Aloud</span>
+                                    <span>🎯 Fun Matching & Circle Games</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- This Book Belongs To Box -->
+                        <div class="w-full max-w-md text-center space-y-2 interactive-widget">
+                            <h3 class="text-2xl font-bold text-slate-900">This Book Belongs To</h3>
+                            <div class="bg-white/90 border-4 border-dashed border-slate-800 rounded-2xl px-5 py-3 text-left shadow-sm flex items-center gap-3">
+                                <label class="text-xl font-bold text-slate-800 whitespace-nowrap">Name:</label>
+                                <input type="text" placeholder="Write your name here..." class="w-full bg-transparent border-b-2 border-slate-400 text-xl font-bold text-sky-700 focus:outline-none py-0.5" />
+                            </div>
+                        </div>
+                    </div>
+                    <canvas class="page-interactive-canvas" data-page="${pageNumber}"></canvas>
+                </div>`;
+            }
+
+            if (pageObj.type === 'cert') {
+                return `
+                <div class="workbook-page">
+                    <div class="page-border justify-between py-10">
+                        <div class="text-center space-y-2">
+                            <div class="text-6xl mb-2">🏆</div>
+                            <h1 class="text-4xl font-bold text-slate-900 uppercase tracking-wide">Certificate of Achievement</h1>
+                            <p class="text-3xl font-bold text-emerald-700 pt-2">Congratulations!</p>
+                        </div>
+
+                        <div class="w-full max-w-lg text-center space-y-6 my-4 interactive-widget">
+                            <p class="text-xl font-semibold text-slate-700">This certificate is proudly presented to</p>
+                            <div class="bg-white/90 border-b-4 border-slate-800 rounded-xl px-6 py-4">
+                                <input type="text" placeholder="Child's Name" class="w-full text-center bg-transparent text-3xl font-bold text-sky-700 focus:outline-none" />
+                            </div>
+                            <p class="text-xl font-semibold text-slate-700 leading-relaxed">
+                                For successfully completing the <br/>
+                                <span class="font-bold text-slate-900 text-2xl">English Alphabet Activity Book (Ages 3–6)!</span>
+                            </p>
+                        </div>
+
+                        <div class="text-center space-y-4">
+                            <div class="flex justify-center gap-4 text-5xl">
+                                <span>⭐</span><span>🌟</span><span>⭐</span>
+                            </div>
+                            <h2 class="text-4xl font-bold text-slate-900">Great Job!</h2>
+                        </div>
+                    </div>
+                    <canvas class="page-interactive-canvas" data-page="${pageNumber}"></canvas>
+                </div>`;
+            }
+
+            const d = pageObj.data;
+
+            // PAGE 1 OF LETTER: COLOUR THE LETTER (Like Page 2 in PDF)
+            if (pageObj.type === 'color') {
+                return `
+                <div class="workbook-page">
+                    <div class="page-border">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-5xl font-bold text-slate-900">${d.letter}${d.lower} is for ${d.word.charAt(0) + d.word.slice(1).toLowerCase()}!</h2>
+                            <p class="text-2xl font-semibold text-slate-700 pt-1">Colour the letter ${d.letter} ${d.lower} (Tap to fill or use the Brush!)</p>
+                        </div>
+
+                        <!-- Giant Outline Letter for Coloring -->
+                        <div class="w-full flex-1 flex flex-col items-center justify-center my-4">
+                            <svg viewBox="0 0 420 300" class="w-full max-w-[430px] h-auto drop-shadow-sm interactive-widget">
+                                <text x="28%" y="235" text-anchor="middle" font-size="235" class="coloring-text" onclick="fillColorElement(this)">${d.letter}</text>
+                                <text x="74%" y="235" text-anchor="middle" font-size="235" class="coloring-text" onclick="fillColorElement(this)">${d.lower}</text>
+                            </svg>
+
+                            <!-- Phonics Companion Card (Tap to Hear) -->
+                            <div onclick="speakCurrentLetter()" class="mt-4 bg-white/85 border-4 border-slate-800 rounded-3xl px-10 py-5 flex items-center gap-6 shadow-sm cursor-pointer hover:scale-105 transition interactive-widget" title="Tap to hear pronunciation!">
+                                <span class="text-7xl">${d.emoji}</span>
+                                <div class="text-left">
+                                    <div class="text-4xl font-bold text-slate-900 tracking-wider flex items-center gap-2">${d.word} <span class="text-2xl">🔊</span></div>
+                                    <div class="text-lg font-semibold text-slate-600">Also: ${d.secondEmoji} ${d.secondWord}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full flex justify-between items-center text-slate-600 font-bold text-sm px-2">
+                            <span>KG2 English Alphabet</span>
+                            <span>Letter ${d.letter}${d.lower} • Page 1</span>
+                        </div>
+                    </div>
+                    <canvas class="page-interactive-canvas" data-page="${pageNumber}"></canvas>
+                </div>`;
+            }
+
+            // PAGE 2 OF LETTER: TRACE THE LETTER & WORD (Like Page 3 in PDF)
+            if (pageObj.type === 'trace') {
+                return `
+                <div class="workbook-page">
+                    <div class="page-border">
+                        <div class="text-center">
+                            <h2 class="text-4xl font-bold text-slate-900">Trace the letter & word</h2>
+                            <p class="text-lg font-semibold text-sky-700">Use your finger, stylus, or mouse to trace over the dots!</p>
+                        </div>
+
+                        <!-- Colored Reference Card -->
+                        <div onclick="speakCurrentLetter()" class="flex items-center gap-6 bg-white/80 border-4 border-slate-800 rounded-3xl px-8 py-3 shadow-sm cursor-pointer interactive-widget">
+                            <div class="text-6xl font-bold text-sky-600">${d.letter}${d.lower}</div>
+                            <div class="text-6xl">${d.emoji}</div>
+                            <span class="text-2xl">🔊</span>
+                        </div>
+
+                        <!-- Primary KG2 Dotted Tracing Lines -->
+                        <div class="w-full space-y-4 my-2">
+                            <!-- Capital Letter Row -->
+                            <div class="trace-line-container">
+                                <svg viewBox="0 0 500 100" class="w-full h-full z-10">
+                                    <text x="65" y="82" font-size="88" class="trace-svg-text">${d.letter}</text>
+                                    <text x="190" y="82" font-size="88" class="trace-svg-text">${d.letter}</text>
+                                    <text x="315" y="82" font-size="88" class="trace-svg-text">${d.letter}</text>
+                                    <text x="435" y="82" font-size="88" class="trace-svg-text">${d.letter}</text>
+                                </svg>
+                            </div>
+
+                            <!-- Lowercase Letter Row -->
+                            <div class="trace-line-container">
+                                <svg viewBox="0 0 500 100" class="w-full h-full z-10">
+                                    <text x="65" y="80" font-size="84" class="trace-svg-text">${d.lower}</text>
+                                    <text x="190" y="80" font-size="84" class="trace-svg-text">${d.lower}</text>
+                                    <text x="315" y="80" font-size="84" class="trace-svg-text">${d.lower}</text>
+                                    <text x="435" y="80" font-size="84" class="trace-svg-text">${d.lower}</text>
+                                </svg>
+                            </div>
+
+                            <!-- Full Word Tracing Box -->
+                            <div class="pt-2 text-center">
+                                <p class="text-2xl font-bold text-slate-800 mb-2">Trace the word</p>
+                                <div class="bg-white/70 border-4 border-dashed border-slate-700 rounded-2xl py-4 px-2">
+                                    <svg viewBox="0 0 500 110" class="w-full h-28">
+                                        <text x="50%" y="86" text-anchor="middle" font-size="${d.word.length > 6 ? '68' : '86'}" letter-spacing="6" class="trace-svg-text">${d.word}</text>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full flex justify-between items-center text-slate-600 font-bold text-sm px-2">
+                            <span>KG2 English Alphabet</span>
+                            <span>Letter ${d.letter}${d.lower} • Page 2</span>
+                        </div>
+                    </div>
+                    <canvas class="page-interactive-canvas" data-page="${pageNumber}"></canvas>
+                </div>`;
+            }
+
+            // PAGE 3 OF LETTER: FIND & CIRCLE THE LETTER (Like Page 4 in PDF)
+            if (pageObj.type === 'find') {
+                const bubbles = [
+                    d.letter, d.distractors[0], d.lower,
+                    d.distractors[1], d.letter, d.distractors[2],
+                    d.distractors[3], d.lower, d.distractors[4],
+                    d.letter, d.distractors[5], d.lower
+                ];
+
+                return `
+                <div class="workbook-page">
+                    <div class="page-border">
+                        <div class="text-center space-y-2">
+                            <h2 class="text-4xl font-bold text-slate-900">Can you find the letter ${d.letter} ${d.lower}?</h2>
+                            <p class="text-2xl font-bold text-sky-700">Tap to Circle it — or draw a circle with your pen!</p>
+                        </div>
+
+                        <!-- Reference Helper -->
+                        <div class="bg-white/85 border-2 border-slate-800 rounded-2xl px-6 py-2 flex items-center gap-4 shadow-sm">
+                            <span class="text-3xl">${d.emoji}</span>
+                            <span class="text-2xl font-bold text-slate-800">Find: <strong class="text-emerald-600 text-3xl">${d.letter}</strong> and <strong class="text-sky-600 text-3xl">${d.lower}</strong></span>
+                        </div>
+
+                        <!-- Grid of Bubbles -->
+                        <div class="grid grid-cols-3 gap-7 my-4 place-items-center w-full max-w-md interactive-widget">
+                            ${bubbles.map(b => `
+                                <div onclick="this.classList.toggle('circled')" class="letter-bubble shadow-sm">
+                                    ${b}
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="w-full flex justify-between items-center text-slate-600 font-bold text-sm px-2">
+                            <span>KG2 English Alphabet</span>
+                            <span>Letter ${d.letter}${d.lower} • Page 3</span>
+                        </div>
+                    </div>
+                    <canvas class="page-interactive-canvas" data-page="${pageNumber}"></canvas>
+                </div>`;
+            }
+
+            // PAGE 4 OF LETTER: DRAW & WRITE (Like Page 5 in PDF)
+            if (pageObj.type === 'draw') {
+                return `
+                <div class="workbook-page">
+                    <div class="page-border">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-4xl font-bold text-slate-900">Draw & Write!</h2>
+                            <p class="text-2xl font-semibold text-slate-700">Draw something that starts with <span class="text-sky-700 font-bold">${d.letter}${d.lower}</span> (like ${d.emoji} ${d.word.toLowerCase()})</p>
+                        </div>
+
+                        <!-- Large Drawing Frame -->
+                        <div class="w-full flex-1 my-4 bg-white/90 border-4 border-slate-800 rounded-3xl relative overflow-hidden shadow-inner flex flex-col justify-between p-4">
+                            <div class="flex justify-between items-center opacity-50 pointer-events-none">
+                                <span class="text-4xl font-bold text-slate-400">${d.letter}${d.lower}</span>
+                                <span class="text-4xl">${d.emoji} ${d.secondEmoji}</span>
+                            </div>
+                            <div class="text-center text-slate-400 text-sm pointer-events-none z-10">
+                                Draw freely anywhere inside this box & write on the lines below!
+                            </div>
+                        </div>
+
+                        <!-- Freehand Writing Line at Bottom -->
+                        <div class="w-full space-y-1 mb-2">
+                            <p class="text-xl font-bold text-slate-800 text-center">Write the letter ${d.letter} ${d.lower} by yourself:</p>
+                            <div class="trace-line-container h-24">
+                                <span class="text-5xl font-bold text-slate-300 select-none">${d.letter} ${d.lower}</span>
+                                <span class="w-24"></span>
+                                <span class="w-24"></span>
+                            </div>
+                        </div>
+
+                        <div class="w-full flex justify-between items-center text-slate-600 font-bold text-sm px-2">
+                            <span>KG2 English Alphabet</span>
+                            <span>Letter ${d.letter}${d.lower} • Page 4</span>
+                        </div>
+                    </div>
+                    <canvas class="page-interactive-canvas" data-page="${pageNumber}"></canvas>
+                </div>`;
+            }
+
+            // PAGE 5 OF LETTER: DRAW A LINE TO MATCH (Like Page 6 in PDF)
+            if (pageObj.type === 'match') {
+                const nextIdx = (pageObj.letterIdx + 1) % alphabetData.length;
+                const prevIdx = (pageObj.letterIdx + 2) % alphabetData.length;
+                const item2 = alphabetData[nextIdx];
+                const item3 = alphabetData[prevIdx];
+
+                const leftCol = [
+                    { label: d.letter, sub: 'Capital Letter', tag: '1' },
+                    { label: d.lower, sub: 'Small Letter', tag: '2' },
+                    { label: item2.letter, sub: 'Review Letter', tag: '3' },
+                    { label: item3.letter, sub: 'Review Letter', tag: '4' }
+                ];
+
+                const rightCol = [
+                    { icon: d.lower, text: `Small ${d.lower}`, matchTag: '1' },
+                    { icon: item3.emoji, text: item3.word, matchTag: '4' },
+                    { icon: d.emoji, text: d.word, matchTag: '2' },
+                    { icon: item2.emoji, text: item2.word, matchTag: '3' }
+                ];
+
+                return `
+                <div class="workbook-page">
+                    <div class="page-border">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-4xl font-bold text-slate-900">Draw a line to match</h2>
+                            <p class="text-2xl font-semibold text-slate-700">Match each letter to its partner or picture!</p>
+                        </div>
+
+                        <!-- Matching Columns -->
+                        <div class="relative w-full flex-1 my-4 flex items-center justify-between px-6">
+                            <!-- Left Column -->
+                            <div class="flex flex-col justify-around h-full z-10 space-y-4">
+                                ${leftCol.map(l => `
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-24 h-24 rounded-3xl bg-white border-4 border-slate-800 shadow-sm flex items-center justify-center text-5xl font-bold text-slate-900">
+                                            ${l.label}
+                                        </div>
+                                        <div class="w-5 h-5 rounded-full bg-slate-800"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="flex flex-col justify-around h-full z-10 space-y-4">
+                                ${rightCol.map(r => `
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-5 h-5 rounded-full bg-slate-800"></div>
+                                        <div class="w-36 h-24 rounded-3xl bg-white border-4 border-slate-800 shadow-sm flex flex-col items-center justify-center p-2">
+                                            <span class="text-4xl font-bold text-sky-700">${r.icon}</span>
+                                            <span class="text-sm font-bold text-slate-700 mt-1">${r.text}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="w-full flex justify-between items-center text-slate-600 font-bold text-sm px-2">
+                            <span>KG2 English Alphabet</span>
+                            <span>Letter ${d.letter}${d.lower} • Page 5</span>
+                        </div>
+                    </div>
+                    <canvas class="page-interactive-canvas" data-page="${pageNumber}"></canvas>
+                </div>`;
+            }
+        }
+
+        // Fill SVG letter when clicked in interactive mode
+        function fillColorElement(el) {
+            el.style.fill = currentColor;
+        }
+
+        // Clear all freehand drawings & fills on the current page
+        function clearCurrentPageDrawing() {
+            delete savedPageDrawings[currentPageIndex];
+            renderCurrentPage();
+        }
+
+        // Activate full-page freehand drawing (Pen, Coloring Brush, Eraser) on the active page
+        function initCanvases(container) {
+            const canvases = container.querySelectorAll('.page-interactive-canvas');
+            canvases.forEach(canvas => {
+                canvas.width = 794;  // Standard A4 pixel width at 96 DPI
+                canvas.height = 1123; // Standard A4 pixel height at 96 DPI
+                const ctx = canvas.getContext('2d');
+                let drawing = false;
+
+                // Restore previous drawing if child already drew on this page
+                if (savedPageDrawings[currentPageIndex]) {
+                    const img = new Image();
+                    img.onload = () => ctx.drawImage(img, 0, 0);
+                    img.src = savedPageDrawings[currentPageIndex];
+                }
+
+                const getPos = (e) => {
+                    const r = canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    return {
+                        x: (clientX - r.left) * (canvas.width / r.width),
+                        y: (clientY - r.top) * (canvas.height / r.height)
+                    };
+                };
+
+                const start = (e) => {
+                    drawing = true;
+                    const pos = getPos(e);
+                    ctx.beginPath();
+                    ctx.moveTo(pos.x, pos.y);
+                };
+
+                const move = (e) => {
+                    if (!drawing) return;
+                    if (e.cancelable) e.preventDefault();
+                    const pos = getPos(e);
+
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    if (currentTool === 'eraser') {
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.lineWidth = 32;
+                    } else if (currentTool === 'brush') {
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = currentColor + '66'; // Semi-transparent highlighter/crayon effect
+                        ctx.lineWidth = 26;
+                    } else {
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = currentColor;
+                        ctx.lineWidth = 7;
+                    }
+
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                };
+
+                const end = () => {
+                    if (drawing) {
+                        drawing = false;
+                        savedPageDrawings[currentPageIndex] = canvas.toDataURL();
+                    }
+                };
+
+                canvas.addEventListener('mousedown', start);
+                canvas.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', end);
+
+                canvas.addEventListener('touchstart', start, { passive: false });
+                canvas.addEventListener('touchmove', move, { passive: false });
+                window.addEventListener('touchend', end);
+            });
+        }
+
+        function renderCurrentPage() {
+            const slot = document.getElementById('activePageSlot');
+            const pageObj = allPagesList[currentPageIndex];
+            slot.innerHTML = generatePageHTML(pageObj, currentPageIndex + 1);
+            document.getElementById('pageIndicator').textContent = `${currentPageIndex + 1} / ${allPagesList.length}`;
+
+            // Sync dropdown if on a letter boundary
+            const sel = document.getElementById('letterSelector');
+            if (currentPageIndex === 0) {
+                sel.value = "0";
+            } else if (currentPageIndex === allPagesList.length - 1) {
+                sel.value = String(allPagesList.length - 1);
+            } else {
+                const letterStart = Math.floor((currentPageIndex - 1) / 5) * 5 + 1;
+                sel.value = String(letterStart);
+            }
+
+            setTimeout(() => initCanvases(slot), 50);
+        }
+
+        function prevPage() {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                renderCurrentPage();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            if (currentPageIndex < allPagesList.length - 1) {
+                currentPageIndex++;
+                renderCurrentPage();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function jumpToLetter(pageIdxStr) {
+            currentPageIndex = parseInt(pageIdxStr, 10) || 0;
+            renderCurrentPage();
+        }
+
+        // Print only the 5 pages of the currently selected letter (fast & convenient)
+        function printCurrentLetterOnly() {
+            const printBox = document.getElementById('printContainer');
+            let pagesToPrint = [];
+
+            if (currentPageIndex === 0 || currentPageIndex === allPagesList.length - 1) {
+                pagesToPrint.push(allPagesList[currentPageIndex]);
+            } else {
+                const startIdx = Math.floor((currentPageIndex - 1) / 5) * 5 + 1;
+                for (let i = startIdx; i < startIdx + 5; i++) {
+                    pagesToPrint.push(allPagesList[i]);
+                }
+            }
+
+            printBox.innerHTML = pagesToPrint.map((p, idx) => generatePageHTML(p, idx + 1)).join('');
+            window.print();
+        }
+
+        // Print the complete workbook (Cover + A-Z + Certificate)
+        function printFullBook() {
+            const printBox = document.getElementById('printContainer');
+            printBox.innerHTML = allPagesList.map((p, idx) => generatePageHTML(p, idx + 1)).join('');
+            window.print();
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            buildPageRegistry();
+            renderCurrentPage();
+        });
+    </script>
+</body>
+</html>
