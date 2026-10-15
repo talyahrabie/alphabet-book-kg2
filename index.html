@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KG2 English Alphabet Activity Book</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&family=Cairo:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;700&family=Cairo:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --page-gradient: linear-gradient(90deg, #dcfce7 0%, #e0f2fe 50%, #dbeafe 100%);
@@ -290,9 +290,9 @@
                 </div>
 
                 <!-- QR Code Link Customizer for the Author -->
-                <div class="flex items-center gap-2 arabic-ui text-xs bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                <div id="authorQrBox" class="flex items-center gap-2 arabic-ui text-xs bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
                     <span class="font-bold text-emerald-800">🔗 رابط الـ QR Code:</span>
-                    <input id="customQrUrlInput" type="url" dir="ltr" placeholder="https://your-interactive-book-link.com" oninput="updateQrUrl(this.value)" class="bg-white border border-emerald-300 rounded-lg px-2.5 py-1 text-xs text-slate-700 w-52 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                    <input id="customQrUrlInput" type="url" dir="ltr" value="https://talyahrabie.github.io/alphabet-book-kg2/" oninput="updateQrUrl(this.value)" class="bg-white border border-emerald-300 rounded-lg px-2.5 py-1 text-xs text-slate-700 w-64 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
                 </div>
             </div>
         </div>
@@ -341,12 +341,12 @@
         let currentTool = 'pen'; // 'pen' | 'brush' | 'eraser'
         let currentPageIndex = 0;
         let allPagesList = [];
-        let interactiveAppUrl = 'https://play.google.com/store/books';
+        let interactiveAppUrl = 'https://talyahrabie.github.io/alphabet-book-kg2/';
         // Save child's drawings per page in memory so they don't disappear when flipping pages
         const savedPageDrawings = {};
 
         function updateQrUrl(val) {
-            interactiveAppUrl = val.trim() || 'https://play.google.com/store/books';
+            interactiveAppUrl = val.trim() || 'https://talyahrabie.github.io/alphabet-book-kg2/';
             if (currentPageIndex === 0) {
                 renderCurrentPage();
             }
@@ -864,7 +864,7 @@
 
                 canvas.addEventListener('touchstart', start, { passive: false });
                 canvas.addEventListener('touchmove', move, { passive: false });
-                window.addEventListener('touchend', end);
+                canvas.addEventListener('touchend', end);
             });
         }
 
@@ -936,6 +936,11 @@
 
         // Initialize on load
         window.addEventListener('DOMContentLoaded', () => {
+            // Hide author QR input box automatically when opened on live GitHub Pages or Netlify domain
+            if (window.location.hostname.includes('netlify.app') || window.location.hostname.includes('github.io')) {
+                const authorBox = document.getElementById('authorQrBox');
+                if (authorBox) authorBox.style.display = 'none';
+            }
             buildPageRegistry();
             renderCurrentPage();
         });
